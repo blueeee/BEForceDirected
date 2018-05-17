@@ -20,8 +20,8 @@
 @implementation BEForceDirectedEdge
 - (id)copyWithZone:(nullable NSZone *)zone {
     BEForceDirectedEdge *edge = [[BEForceDirectedEdge alloc] init];
-    edge.source = [self.source copy];
-    edge.target = [self.target copy];
+    edge.source = self.source;
+    edge.target = self.target;
     return self;
 }
 @end
@@ -86,8 +86,34 @@
     memset(xs, 0, sizeof(xs));
     memset(ys, 0, sizeof(ys));
     
-    double distX, distY, dist;
+    [self repulsiveForceWithXs:xs ys:ys k:k];
+    [self tractionForceWithXs:xs ys:ys k:k];
     
+    //mix
+    CGFloat maxtx = self.configuration.iteDistance, maxty = self.configuration.iteDistance;
+    for (int v = 0; v < self.nodes.count; v++) {
+        BEForceDirectedNode *node = self.nodes[v];
+        CGFloat dx = xs[v];
+        CGFloat dy = ys[v];
+        
+        if (dx < -maxtx) dx = -maxtx;
+        if (dx > maxtx) dx = maxtx;
+        if (dy < -maxty) dy = -maxty;
+        if (dy > maxty) dy = maxty;
+        
+        if (!self.configuration.hasBoundary) {
+            node.position = CGPointMake(node.position.x + dx, node.position.y + dy);
+            
+        } else {
+            CGFloat x = (node.position.x + dx) >= self.configuration.size.width || (node.position.x + dx) <= 0 ? node.position.x - dx : node.position.x + dx;
+            CGFloat y = (node.position.y + dy) >= self.configuration.size.height || (node.position.y + dy) <= 0 ? node.position.y - dy : node.position.y + dy;
+            node.position = CGPointMake(x, y);
+        }
+    }
+}
+
+-(void)repulsiveForceWithXs:(CGFloat *)xs ys:(CGFloat *)ys k:(double)k{
+    double distX, distY, dist;
     // Coulomb's law
     int ejectFactor = 6;
     for (int v = 0; v < self.nodes.count; v++) {
@@ -105,6 +131,10 @@
             }
         }
     }
+}
+
+-(void)tractionForceWithXs:(CGFloat *)xs ys:(CGFloat *)ys k:(double)k {
+    double distX, distY, dist;
     
     //Hooke's law
     int condenseFactor = 3;
@@ -125,29 +155,8 @@
         xs[endIndex] = xs[endIndex] + distX * dist / k * condenseFactor;
         ys[endIndex] = ys[endIndex] + distY * dist / k * condenseFactor;
     }
-    
-    //mix
-    CGFloat maxt = self.configuration.iteDistance, maxty = self.configuration.iteDistance;
-    for (int v = 0; v < self.nodes.count; v++) {
-        BEForceDirectedNode *node = self.nodes[v];
-        CGFloat dx = xs[v];
-        CGFloat dy = ys[v];
-        
-        if (dx < -maxt) dx = -maxt;
-        if (dx > maxt) dx = maxt;
-        if (dy < -maxty) dy = -maxty;
-        if (dy > maxty) dy = maxty;
-        
-        if (!self.configuration.hasBoundary) {
-            node.position = CGPointMake(node.position.x + dx, node.position.y + dy);
-            
-        } else {
-            CGFloat x = (node.position.x + dx) >= self.configuration.size.width || (node.position.x + dx) <= 0 ? node.position.x - dx : node.position.x + dx;
-            CGFloat y = (node.position.y + dy) >= self.configuration.size.height || (node.position.y + dy) <= 0 ? node.position.y - dy : node.position.y + dy;
-            node.position = CGPointMake(x, y);
-        }
-    }
 }
+
 
 -(BEForceDirectedConfiguration *)configuration {
     if (!_configuration) {
