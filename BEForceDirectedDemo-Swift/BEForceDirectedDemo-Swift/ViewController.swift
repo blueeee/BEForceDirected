@@ -83,7 +83,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
                 transferEdges!.append(ForceDirectedEdge(source: transferNodes![source - 1] , target: transferNodes![target - 1]));
             }
             
-            forceDirectedGenerator =  ForceDirectedGenerator (nodes: transferNodes, edges: transferEdges, configuration: ForceDirectedConfiguration(size: CGSize(width: 400, height: 400), hasBoundary: false, times: 600, iteDistance: 1))
+            forceDirectedGenerator =  ForceDirectedGenerator (nodes: transferNodes, edges: transferEdges, configuration: ForceDirectedConfiguration(size: CGSize(width: 400, height: 400), hasBoundary: false, times: 400, iteDistance: 4))
         }
     }
     
@@ -98,19 +98,20 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         guard let forceDirectedGenerator = self.forceDirectedGenerator else {
             return
         }
-        let nodeLength = 20;
+        let nodeLength = 8;
         let widthOffset = (ViewController.contentWidth - forceDirectedGenerator.configuration.size.width)/2
         let heightOffset = (ViewController.contentHeight - forceDirectedGenerator.configuration.size.height)/2
         
         if let nodes = forceDirectedGenerator.nodes {
             nodes.forEach {
                 let position = $0.position
-                let layer = CALayer()
+                let layer = NodeLayer()
                 layer.bounds = CGRect(x: 0, y: 0, width: nodeLength, height: nodeLength)
                 layer.position = CGPoint(x: position.x + widthOffset, y: position.y + heightOffset)
-                layer.backgroundColor = UIColor.black.cgColor
+                layer.randomBackgroundColor()
                 layer.cornerRadius = CGFloat(nodeLength / 2)
                 contentView.layer.addSublayer(layer)
+                layer.springAnimation()
             }
         }
         
