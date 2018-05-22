@@ -156,8 +156,8 @@
 -(void)drawEdgesWithEdges:(NSArray *)edges {
     if (!self.lineLayer) {
         self.lineLayer = [[CAShapeLayer alloc] init];
-        self.lineLayer.bounds = self.view.bounds;
-        self.lineLayer.position = self.view.center;
+        self.lineLayer.bounds = self.contentView.bounds;
+        self.lineLayer.position = self.contentView.center;
         self.lineLayer.strokeColor = [UIColor grayColor].CGColor;
         
         self.lineLayer.lineWidth = 0.6;
