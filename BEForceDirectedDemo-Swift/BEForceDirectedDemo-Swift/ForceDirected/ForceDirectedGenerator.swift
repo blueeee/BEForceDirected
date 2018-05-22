@@ -98,9 +98,7 @@ class ForceDirectedGenerator {
     
     //随机分布
     public func random() {
-        guard let nodes = self.nodes else {
-            return
-        }
+        guard let nodes = self.nodes else { return }
         for node: ForceDirectedNode in nodes {
             node.position = CGPoint(x: CGFloat(arc4random() % UInt32(self.configuration.size.width)),y: CGFloat(arc4random() % UInt32(self.configuration.size.height)))
         }
@@ -109,9 +107,7 @@ class ForceDirectedGenerator {
     
     //迭代
     public func layout() {
-        guard let nodes = self.nodes, nodes.count != 0 else {
-            return
-        }
+        guard let nodes = self.nodes, nodes.count != 0 else { return }
         self.constant = Float(sqrt(self.configuration.size.width * self.configuration.size.height / CGFloat(nodes.count)))
         
         var positions:[CGPoint] = [CGPoint]()
@@ -122,9 +118,7 @@ class ForceDirectedGenerator {
     
     //引力计算
     private func repulsiveForce(positions:inout [CGPoint]) {
-        guard let nodes = self.nodes else {
-            return
-        }
+        guard let nodes = self.nodes else { return }
         var distX: CGFloat, distY: CGFloat, dist:CGFloat
         // Coulomb's law
         let ejectFactor: CGFloat = 6;
@@ -147,9 +141,7 @@ class ForceDirectedGenerator {
     
     //斥力计算
     private func tractionForce(positions:inout [CGPoint]) {
-        guard let edges = self.edges, let nodes = self.nodes else {
-            return
-        }
+        guard let edges = self.edges, let nodes = self.nodes else { return }
         var distX: CGFloat, distY: CGFloat, dist: CGFloat
         // Hooke's law
         let condenseFactor: CGFloat = 6;
@@ -157,9 +149,7 @@ class ForceDirectedGenerator {
             let startNode = edges[e].source
             let endNode = edges[e].target
             
-            guard let startIndex = nodes.index(of: startNode), let endIndex = nodes.index(of: endNode) else {
-                return
-            }
+            guard let startIndex = nodes.index(of: startNode), let endIndex = nodes.index(of: endNode) else { return }
             
             distX = startNode.position.x - endNode.position.x
             distY = startNode.position.y - endNode.position.y
@@ -178,9 +168,7 @@ class ForceDirectedGenerator {
     
     //计算最终位置
     private func mix(positions: [CGPoint]) {
-        guard var nodes = self.nodes else {
-            return
-        }
+        guard var nodes = self.nodes else { return }
         
         let maxX = self.configuration.iteDistance
         let maxY = self.configuration.iteDistance

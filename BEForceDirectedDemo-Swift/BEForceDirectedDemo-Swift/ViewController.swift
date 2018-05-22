@@ -46,40 +46,22 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     }
     
     private func initData() {
-        guard let path = Bundle.main.path(forResource: "data", ofType: "json") else {
-            return;
-        }
-        
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
-            return
-        }
-        
-        guard let dataAny = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) else {
-            return
-        }
-        
-        guard let dataDictionary = dataAny as? [String : Any] else {
-            return
-        }
-        
-        guard let nodesAny = dataDictionary["node"], let edgesAny = dataDictionary["edge"] else {
-            return
-        }
+        guard let path = Bundle.main.path(forResource: "data", ofType: "json") else { return }
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { return }
+        guard let dataAny = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) else { return }
+        guard let dataDictionary = dataAny as? [String : Any] else { return }
+        guard let nodesAny = dataDictionary["node"], let edgesAny = dataDictionary["edge"] else { return }
 
         if let nodes = nodesAny as? [[String : String]], let edges = edgesAny as? [[String : Int]] {
             var transferNodes: [ForceDirectedNode]? = []
             var transferEdges: [ForceDirectedEdge]? = []
             nodes.forEach {
-                guard let name = $0["name"] else {
-                    return
-                }
+                guard let name = $0["name"] else { return }
                 transferNodes!.append(ForceDirectedNode(position: CGPoint(x: 0, y: 0), identifier: name));
             }
             
             edges.forEach {
-                guard let source = $0["source"], let target = $0["target"] else {
-                    return
-                }
+                guard let source = $0["source"], let target = $0["target"] else { return }
                 transferEdges!.append(ForceDirectedEdge(source: transferNodes![source - 1] , target: transferNodes![target - 1]));
             }
             
@@ -95,9 +77,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     }
     
     private func drawNodesAndEdges() {
-        guard let forceDirectedGenerator = self.forceDirectedGenerator else {
-            return
-        }
+        guard let forceDirectedGenerator = self.forceDirectedGenerator else { return }
         let nodeLength = 8;
         let widthOffset = (ViewController.contentWidth - forceDirectedGenerator.configuration.size.width)/2
         let heightOffset = (ViewController.contentHeight - forceDirectedGenerator.configuration.size.height)/2
